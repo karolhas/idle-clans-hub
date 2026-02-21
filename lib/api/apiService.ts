@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Player } from '@/types/player.types';
 import { ClanData } from '@/types/clan.types';
-import { LeaderboardData, GameMode, LeaderboardStat, EntityType, LeaderboardCategory, LeaderboardEntry } from '@/types/leaderboard.types';
+import { LeaderboardData, LeaderboardProfile, GameMode, LeaderboardStat, EntityType, LeaderboardCategory, LeaderboardEntry } from '@/types/leaderboard.types';
 
 const BASE_URL = 'https://query.idleclans.com/api';
 const TIMEOUT = 5000; // 5 seconds timeout
@@ -63,6 +63,27 @@ export const fetchClanByName = async (clanName: string): Promise<ClanData> => {
             }
         }
         throw new Error('Failed to fetch clan data. Please try again.');
+    }
+};
+
+export const fetchLeaderboardProfile = async (
+    username: string,
+    gameMode: GameMode
+): Promise<LeaderboardProfile | null> => {
+    try {
+        const leaderboardName = `players:${gameMode}`;
+        const response = await axios.get(
+            `${BASE_URL}/Leaderboard/profile/${encodeURIComponent(leaderboardName)}/${encodeURIComponent(username)}`,
+            { timeout: TIMEOUT }
+        );
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 404) {
+                return null;
+            }
+        }
+        return null;
     }
 };
 
