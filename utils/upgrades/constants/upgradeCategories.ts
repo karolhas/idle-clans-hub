@@ -30,7 +30,7 @@ export const UPGRADE_CATEGORIES = {
     "pickyEater",
     "ammo-saver",
     "teamwork",
-    "bountyHunter",
+    "upgrade_bounty_hunter",
   ],
   unlockedWithItems: [
     "arrowCrafter",
@@ -43,5 +43,11 @@ export const UPGRADE_CATEGORIES = {
     "responsibleDrinking",
     "betterFisherman",
     "betterLumberjack",
+    "upgrade_bloodmoon_exterminator",
+    "upgrade_bloodmoon_fisherman",
+    "upgrade_bloodmoon_helmet_upgrade",
+    "upgrade_bloodmoon_preparation",
+    "upgrade_skilling_ticket_boost",
+    "upgrade_bounty_hunter",
   ],
 };

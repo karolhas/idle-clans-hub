@@ -26,7 +26,12 @@ export const MAX_TIERS = (upgradeName: string): number => {
     pickyEater: 1,
     "ammo-saver": 6,
     teamwork: 1,
-    bountyHunter: 1,
+    upgrade_bounty_hunter: 1,
+    upgrade_skilling_ticket_boost: 1,
+    upgrade_bloodmoon_exterminator: 1,
+    upgrade_bloodmoon_fisherman: 1,
+    upgrade_bloodmoon_helmet_upgrade: 1,
+    upgrade_bloodmoon_preparation: 1,
   };
   return maxTiers[upgradeName] || 1;
 };
