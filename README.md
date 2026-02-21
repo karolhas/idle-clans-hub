@@ -4,13 +4,14 @@ A powerful web application for searching and viewing detailed player statistics,
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
-- **Core**: [React 19](https://react.dev/)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Turbopack)
+- **Core**: [React 19](https://react.dev/) with [TypeScript](https://www.typescriptlang.org/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **State Management**: [Zustand](https://github.com/pmndrs/zustand)
-- **HTTP Client**: [Axios](https://axios-http.com/)
-- **Icons**: [React Icons](https://react-icons.github.io/react-icons/)
-- **Tooltips**: [React Tooltip](https://react-tooltip.com/)
+- **State**: [Zustand](https://github.com/pmndrs/zustand) (UI/search state) · [TanStack Query](https://tanstack.com/query/latest) (server state, caching, infinite queries)
+- **HTTP**: [Axios](https://axios-http.com/)
+- **Icons & UI**: [React Icons](https://react-icons.github.io/react-icons/) · [React Tooltip](https://react-tooltip.com/)
+- **Security**: [DOMPurify](https://github.com/cure53/DOMPurify) (content sanitization)
+- **Testing**: [Jest](https://jestjs.io/) · [React Testing Library](https://testing-library.com/react)
 
 ## ✨ Features
 
@@ -62,7 +63,7 @@ Analyze clan performance.
 
 ### 🚀 Additional Features
 
-- **Smart Caching**: Data is cached for 5 minutes to ensure fast navigation and reduced API load.
+- **Smart Caching**: TanStack Query caches API data with configurable stale times for fast navigation and reduced API load.
 - **Logs Viewer**: Searchable history of player and clan activities.
 - **Dark Mode**: Fully responsive dark theme for comfortable viewing.
 - **Direct Integration**: Real-time data fetching from Idle Clans API.
