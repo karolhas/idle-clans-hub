@@ -152,7 +152,10 @@ export interface RawDropEntry {
 export interface RawRaidData extends Record<string, unknown> {
   name: string;
   drops?: RawDropEntry[];
-  requirements?: unknown;
+  requirements?: {
+    normal: Record<string, number>;
+    ironman: Record<string, number>;
+  };
 }
 
 export function getRaidData(raidName: string): RawRaidData | null {

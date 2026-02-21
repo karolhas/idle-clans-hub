@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import {
   FaChartBar,
   FaCalculator,
@@ -11,7 +13,7 @@ import {
   FaGlobe,
 } from "react-icons/fa";
 import { SiBuymeacoffee } from "react-icons/si";
-import DashboardCard from "@/components/dashboard/DashboardCard";
+import DashboardCard, { type ColorKey } from "@/components/dashboard/DashboardCard";
 import StatCard from "@/components/dashboard/StatCard";
 
 export default function Home() {
@@ -39,7 +41,7 @@ export default function Home() {
     },
   ];
 
-  const tools = [
+  const tools: { title: string; description: string; icon: React.ReactElement; href: string; color: ColorKey }[] = [
     {
       title: "Player & Clan Search",
       description:

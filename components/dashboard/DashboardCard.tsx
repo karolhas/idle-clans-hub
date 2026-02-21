@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 
-type ColorKey = "emerald" | "sky" | "violet" | "amber" | "rose" | "cyan";
+export type ColorKey = "emerald" | "sky" | "violet" | "amber" | "rose" | "cyan";
 
 interface ColorClasses {
     bg: string;
