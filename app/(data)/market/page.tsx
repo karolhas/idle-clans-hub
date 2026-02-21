@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FaStore, FaSync, FaTags, FaChartLine } from "react-icons/fa";
-import { useMarketData } from "@/hooks/useMarketData";
+import { useMarketPricesQuery } from "@/hooks/queries/useMarketPricesQuery";
 import ProfitableItemsTable from "@/components/market/ProfitableItemsTable";
 import UnderpricedItemsTable from "@/components/market/UnderpricedItemsTable";
 
@@ -14,7 +14,7 @@ export default function MarketPage() {
   const [manualPotionCost, setManualPotionCost] = useState<string>("");
 
   const { loading, error, profitable, underpriced, refresh, autoPotionCost } =
-    useMarketData(isClanBonusActive, isPotionBonusActive);
+    useMarketPricesQuery(isClanBonusActive, isPotionBonusActive);
 
   const potionCost = useAutoPotionCost
     ? autoPotionCost || 0

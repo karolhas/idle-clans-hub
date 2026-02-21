@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+
 import {
   FaChartBar,
   FaCalculator,
@@ -11,35 +13,35 @@ import {
   FaGlobe,
 } from "react-icons/fa";
 import { SiBuymeacoffee } from "react-icons/si";
-import DashboardCard from "@/components/dashboard/DashboardCard";
+import DashboardCard, { type ColorKey } from "@/components/dashboard/DashboardCard";
 import StatCard from "@/components/dashboard/StatCard";
 
 export default function Home() {
   const stats = [
     {
       title: "Players Online",
-      value: "767", // Mock data
+      value: "2634",
       subtitle: "Playing",
       icon: <FaUsers className="w-5 h-5" />,
       trend: "Right Now",
     },
     {
       title: "All Time Peak",
-      value: "911", // Mock data
+      value: "2911",
       subtitle: "October 2025",
       icon: <FaTrophy className="w-5 h-5" />,
       trend: "New Record",
     },
     {
       title: "Website Visitors",
-      value: "5,6k", // Mock data
+      value: "8,5k",
       subtitle: "This month",
       icon: <FaGlobe className="w-5 h-5" />,
-      trend: "+11,7%",
+      trend: "+22,7%",
     },
   ];
 
-  const tools = [
+  const tools: { title: string; description: string; icon: React.ReactElement; href: string; color: ColorKey }[] = [
     {
       title: "Player & Clan Search",
       description:

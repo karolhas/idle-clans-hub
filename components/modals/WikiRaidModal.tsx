@@ -125,25 +125,23 @@ export function WikiRaidModal({ isOpen, onClose, raidName }: WikiRaidModalProps)
   // Load raid data from local JSON
   useEffect(() => {
     if (isOpen && raidName) {
-      const data = getRaidData(raidName);
-      setRaidData(data);
+      const rawData = getRaidData(raidName);
 
-      if (data) {
-        // Process requirements data
-        if (data.requirements) {
-          setRaidRequirements(data.requirements);
+      if (rawData) {
+        if (rawData.requirements) {
+          setRaidRequirements(rawData.requirements);
         }
 
-        // Process drops data
-        const drops: RaidDrop[] = data.drops.map((dropItem: any) => ({
+        const drops: RaidDrop[] = (rawData.drops ?? []).map((dropItem) => ({
           item: dropItem.item,
           quantity: dropItem.quantity,
           rarity: dropItem.chance,
           dropRate: dropItem.chance,
         }));
         setRaidDrops(drops);
+        setRaidData(rawData as unknown as RaidData);
       } else {
-        // Reset state if raid not found
+        setRaidData(null);
         setRaidStats({});
         setRaidDrops([]);
         setRaidRequirements(null);

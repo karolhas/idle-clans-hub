@@ -13,7 +13,7 @@ interface ClanInfoModalProps {
   clanName: string;
   memberCount: number;
   clanData: ClanData;
-  standalone?: boolean;
+  variant?: "modal" | "inline";
   onSearchMember?: (memberName: string) => void;
   onSearchClan?: (clanName: string) => void;
 }
@@ -24,14 +24,15 @@ export default function ClanInfoModal({
   clanName,
   memberCount,
   clanData,
-  standalone = false,
+  variant = "modal",
   onSearchMember,
   onSearchClan,
 }: ClanInfoModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const isInline = variant === "inline";
 
   useEffect(() => {
-    if (!isOpen || standalone) return;
+    if (isInline || !isOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -42,23 +43,34 @@ export default function ClanInfoModal({
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    modalRef.current?.focus();
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, onClose, standalone]);
+  }, [isOpen, onClose, isInline]);
 
-  if (!isOpen && !standalone) return null;
+  if (!isOpen && !isInline) return null;
 
   const content = (
     <div
       ref={modalRef}
+      role={isInline ? undefined : "dialog"}
+      aria-modal={isInline ? undefined : true}
+      aria-label={isInline ? undefined : `Clan: ${clanName}`}
+      tabIndex={isInline ? undefined : -1}
       className={`relative bg-[#031111]/95 p-6 md:p-8 rounded-2xl border-2 border-white/10 w-full custom-scrollbar ${
-        standalone ? "" : "max-w-5xl max-h-[90vh] overflow-y-auto"
-      } shadow-2xl backdrop-blur-xl animate-fade-in`}
+        isInline ? "" : "max-w-5xl max-h-[90vh] overflow-y-auto"
+      } shadow-2xl backdrop-blur-xl animate-fade-in outline-none`}
     >
-      {/* Close Button */}
-      {!standalone && (
+      {!isInline && (
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-2 rounded-lg"
@@ -73,7 +85,7 @@ export default function ClanInfoModal({
         memberCount={memberCount}
         clanData={clanData}
         onSearchClan={onSearchClan}
-        onClose={!standalone ? onClose : undefined}
+        onClose={!isInline ? onClose : undefined}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -81,14 +93,14 @@ export default function ClanInfoModal({
           clanData={clanData}
           clanName={clanName}
           onSearchMember={onSearchMember}
-          onClose={!standalone ? onClose : undefined}
+          onClose={!isInline ? onClose : undefined}
         />
         <ClanDetailsCard clanData={clanData} />
       </div>
     </div>
   );
 
-  if (standalone) {
+  if (isInline) {
     return <div className="space-y-8 animate-fade-in">{content}</div>;
   }
 

@@ -23,12 +23,6 @@ export function useWikiContent(itemName: string) {
       setError(null);
 
       try {
-        // Format the item name to match wiki's pattern:
-        // 1. Split into words
-        // 2. Capitalize first letter of first word only
-        // 3. Join with underscores
-        // 4. Handle special cases where input might already be formatted or needs specific handling
-
         let formattedName = itemName;
 
         // Only apply standard formatting if it's not a pre-formatted special case (like "Godlike_battleaxe")
@@ -43,9 +37,6 @@ export function useWikiContent(itemName: string) {
             .join("_");
         }
 
-        console.log("Fetching wiki content for:", formattedName); // Debug log
-
-        // Use our proxy API route
         const response = await fetch(`/api/wiki?page=${formattedName}`);
 
         if (!response.ok) {
@@ -53,7 +44,6 @@ export function useWikiContent(itemName: string) {
         }
 
         const data = await response.json();
-        console.log("Wiki API response:", data); // Debug log
 
         if (data.error) {
           if (data.error.code === "missingtitle") {
@@ -66,11 +56,7 @@ export function useWikiContent(itemName: string) {
           throw new Error("Page not found");
         }
 
-        // Remove debug logs
-        // Log the raw HTML before processing
-        // console.log('Raw HTML before processing:', data.parse.text['*']);
-
-        // Sanitize the HTML content
+        // DOMPurify allowlist is intentionally restrictive to prevent XSS from wiki HTML
         const sanitizedHtml = DOMPurify.sanitize(data.parse.text["*"], {
           ALLOWED_TAGS: [
             "p",
@@ -99,24 +85,18 @@ export function useWikiContent(itemName: string) {
           FORBID_ATTR: ["onerror", "onload"],
         });
 
-        // Process the HTML to remove unwanted sections and text
         const processedHtml = sanitizedHtml
-          // Remove Contents section
           .replace(
             /<h2[^>]*>Contents(?:\[<a[^>]*>edit<\/a> \| <a[^>]*>edit source<\/a>\])?<\/h2>/g,
             ""
           )
-          // Remove all TOC elements
           .replace(
             /<ul[^>]*>[\s\S]*?<li[^>]*class="toclevel[^"]*"[\s\S]*?<\/ul>/g,
             ""
           )
           .replace(/<li[^>]*class="toclevel[^"]*"[^>]*>[\s\S]*?<\/li>/g, "")
-          // Remove all edit source links
           .replace(/\[<a[^>]*>edit<\/a> \| <a[^>]*>edit source<\/a>\]/g, "")
-          // Remove the word "Combat"
           .replace(/>Combat</g, "><")
-          // Handle thumbnail paths like /images/thumb/1/10/Gold.png/20px-Gold.png
           .replace(
             /\/images\/thumb\/[^/]+\/[^/]+\/([^/]+)\.png\/[^\"]+/g,
             (match, filename) => {
@@ -124,7 +104,6 @@ export function useWikiContent(itemName: string) {
               return `/gameimages/${localFilename}.png`;
             }
           )
-          // Handle direct file paths like /index.php/File:Gold.png
           .replace(/\/index.php\/File:([^"]+)\.png/g, (match, filename) => {
             const localFilename = filename.toLowerCase().replace(/\s+/g, "_");
             return `/gameimages/${localFilename}.png`;

@@ -12,7 +12,6 @@ interface UnifiedSearchProps {
   setSearchQuery: (query: string) => void;
   onSearch: (query: string) => void;
   isLoading: boolean;
-  // History props
   recentSearches: string[];
   onRecentSearchClick: (query: string) => void;
   onClearHistory: () => void;
@@ -33,7 +32,6 @@ export default function UnifiedSearch({
 
   return (
     <div className="w-full mx-auto relative overflow-hidden rounded-2xl border-2 border-emerald-700/30 bg-gradient-to-br from-[#001515] to-[#001212] p-4 md:p-8 shadow-[0_0_40px_rgba(16,185,129,0.1)]">
-      {/* Background Glow Effects */}
       <div className="absolute top-0 right-0 -mt-20 -mr-20 w-80 h-80 bg-emerald-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-80 h-80 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -51,12 +49,12 @@ export default function UnifiedSearch({
             isLoading={isLoading}
           />
 
-          {/* Recent Searches Section */}
           {recentSearches.length > 0 && (
             <div className="mt-2 animate-fade-in">
               <div className="flex items-center justify-between mb-3 text-xs md:text-sm text-gray-400 px-1">
                 <button
                   onClick={() => setIsHistoryVisible(!isHistoryVisible)}
+                  aria-expanded={isHistoryVisible}
                   className="flex items-center gap-2 hover:text-white transition-colors"
                 >
                   <FaHistory className="w-3 h-3 md:w-4 md:h-4" />

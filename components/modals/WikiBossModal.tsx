@@ -133,8 +133,7 @@ export function WikiBossModal({ isOpen, onClose, bossName }: WikiBossModalProps)
         };
         setBossStats(stats);
 
-        // Process drops data
-        const drops: BossDrop[] = data.drops.map((dropItem: any) => ({
+        const drops: BossDrop[] = data.drops.map((dropItem) => ({
           item: dropItem.item,
           quantity: dropItem.quantity,
           rarity: dropItem.chance,
@@ -142,7 +141,6 @@ export function WikiBossModal({ isOpen, onClose, bossName }: WikiBossModalProps)
         }));
         setBossDrops(drops);
       } else {
-        // Fallback to wiki parsing if boss not found in local data
         setBossStats({});
         setBossDrops([]);
       }

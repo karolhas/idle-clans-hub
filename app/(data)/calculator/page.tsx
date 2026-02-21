@@ -3,25 +3,21 @@
 import { useState, useEffect, useRef } from "react";
 import { FaCalculator, FaSearch, FaTimes } from "react-icons/fa";
 import { fetchPlayerProfile, fetchClanByName } from "@/lib/api/apiService";
+import { parseClanSkills } from "@/utils/parseClanSkills";
 import { Player } from "@/types/player.types";
 import type { PlayerClan } from "@/types/player.types";
 import Calculator from "@/components/calculator/Calculator";
 import { useSearchStore } from "@/lib/store/searchStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CalculatorPage() {
   const [username, setUsername] = useState("");
   const [playerData, setPlayerData] = useState<Player | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {
-    latestPlayerLookup,
-    getCachedPlayer,
-    setCachedPlayer,
-    getCachedClan,
-    setCachedClan,
-  } = useSearchStore();
+  const queryClient = useQueryClient();
+  const { latestPlayerLookup } = useSearchStore();
 
-  // Load username from localStorage on mount, with expiry
   useEffect(() => {
     let shouldFetch = false;
 
@@ -41,29 +37,24 @@ export default function CalculatorPage() {
           localStorage.removeItem("idleclans_calculator_username");
         }
       } catch {
-        // fallback for old format
+        // fallback for legacy string format (no timestamp)
         setUsername(saved);
         shouldFetch = true;
       }
     }
 
-    // Auto-fetch only on initial mount if we have a valid username
     if (shouldFetch) {
-      setTimeout(() => fetchProfile(), 100); // Small delay to ensure state is set
+      setTimeout(() => fetchProfile(), 100);
     }
   }, []);
 
-  // Debounced function to save username to localStorage
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (username) {
-      // Clear previous timeout
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
       }
-
-      // Set new timeout to save to localStorage after 500ms of no typing
       debounceTimeout.current = setTimeout(() => {
         localStorage.setItem(
           "idleclans_calculator_username",
@@ -71,8 +62,6 @@ export default function CalculatorPage() {
         );
       }, 500);
     }
-
-    // Cleanup timeout on unmount
     return () => {
       if (debounceTimeout.current) {
         clearTimeout(debounceTimeout.current);
@@ -92,27 +81,29 @@ export default function CalculatorPage() {
     setError(null);
 
     try {
-      // Check cache first
-      let playerData = getCachedPlayer(username);
-      if (!playerData) {
-        playerData = await fetchPlayerProfile(username);
-        setCachedPlayer(username, playerData);
-      }
+      const player = await queryClient.fetchQuery({
+        queryKey: ["player", username],
+        queryFn: () => fetchPlayerProfile(username),
+        staleTime: 5 * 60 * 1000,
+      });
 
       let clanData = null;
-      if (playerData.guildName) {
+      if (player.guildName) {
         try {
-          clanData = getCachedClan(playerData.guildName);
-          if (!clanData) {
-            clanData = await fetchClanByName(playerData.guildName);
-            setCachedClan(playerData.guildName, clanData);
-          }
+          clanData = await queryClient.fetchQuery({
+            queryKey: ["clan", player.guildName],
+            queryFn: async () => {
+              const raw = await fetchClanByName(player.guildName!);
+              return parseClanSkills(raw);
+            },
+            staleTime: 5 * 60 * 1000,
+          });
         } catch (clanErr) {
           console.error("Failed to fetch clan data:", clanErr);
         }
       }
       setPlayerData({
-        ...playerData,
+        ...player,
         clan: (clanData as unknown as PlayerClan) || {},
       });
     } catch (err) {

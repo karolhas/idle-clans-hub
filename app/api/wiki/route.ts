@@ -9,9 +9,6 @@ export async function GET(request: Request) {
   }
 
   try {
-    console.log('Fetching wiki page:', page); // Debug log
-
-    // Helper function to try grabbing a page
     const tryFetchPage = async (pageName: string) => {
       const response = await fetch(
         `https://wiki.idleclans.com/api.php?action=parse&page=${encodeURIComponent(pageName)}&format=json&prop=text&redirects=true`
@@ -28,20 +25,16 @@ export async function GET(request: Request) {
       return null;
     };
 
-    // First try the original page name
     let data = await tryFetchPage(page);
-    
-    // If that fails and it's a pet name, try the wiki name
+
     if (!data) {
       const petNameMap: { [key: string]: string } = {
-        // Combat pets
         'magic': "Lil' wizard",
         'melee': "Lil' fighter",
         'archery': "Lil' archer",
         'defence': "Lil' eclipse",
         'gilded_pet_1': "Lil' companion",
         'gilded_pet_2': "Lil' swagger",
-        // Skill pets
         'agility': "Lil' runner",
         'brewing': "Lil' brewer",
         'carpentry': "Lil' carpenter",
@@ -55,24 +48,21 @@ export async function GET(request: Request) {
         'smithing': "Lil' smither",
         'woodcutting': "Lil' chopper"
       };
-      
-      // Check if any pet type exists in the page name
+
       const petType = Object.keys(petNameMap).find(type => {
         const lowerPage = page.toLowerCase();
         if (type === 'gilded') {
-          // For gilded pets, check for gilded_pet_X pattern
           return /^gilded_pet_\d+$/.test(lowerPage);
         }
         return lowerPage === type || lowerPage.startsWith(`${type} `);
       });
-      
+
       if (petType) {
-        console.log('Found pet type:', petType, 'mapping to:', petNameMap[petType]);
         data = await tryFetchPage(petNameMap[petType]);
       }
     }
-    
-    // If that fails and the name contains a possessive form, try with an apostrophe
+
+    // Some wiki pages use possessive forms (e.g. "Warrior's" instead of "Warriors")
     if (!data && (page.includes('Warriors') || page.includes('Mages') || page.includes('Nagas') || page.includes('Archers') || page.includes('Guardians') || page.includes('Necromancers'))) {
       const apostropheVersion = page
         .replace('Warriors', "Warrior's")
@@ -81,39 +71,29 @@ export async function GET(request: Request) {
         .replace('Archers', "Archer's")
         .replace('Guardians', "Guardian's")
         .replace('Necromancers', "Necromancer's");
-      console.log('Trying with apostrophe:', apostropheVersion);
       data = await tryFetchPage(apostropheVersion);
     }
-    
-    // If that fails and contains tier, try capitalizing it and other checks
+
     if (!data && page.includes('tier')) {
       const capitalizedVersion = page.replace(/tier/i, 'Tier');
       const withParentheses = capitalizedVersion.replace(/Tier_(\d+)/, '(Tier_$1)');
-      console.log('Trying with capitalized Tier and parentheses:', withParentheses);
       data = await tryFetchPage(withParentheses);
     }
-    
-    // If still not found, try searching
+
     if (!data) {
-      console.log('Page not found, searching for alternatives...'); // Debug log
-      
       const searchResponse = await fetch(
         `https://wiki.idleclans.com/api.php?action=query&list=search&srsearch=${encodeURIComponent(page)}&format=json`
       );
-      
+
       if (!searchResponse.ok) {
         console.error('Wiki search error:', searchResponse.status, searchResponse.statusText);
         throw new Error(`Failed to search wiki: ${searchResponse.status} ${searchResponse.statusText}`);
       }
 
       const searchData = await searchResponse.json();
-      console.log('Wiki search response:', searchData); // Debug log
-      
+
       if (searchData.query?.search?.[0]) {
-        // If we found a match, try to get that page
         const correctPage = searchData.query.search[0].title;
-        console.log('Found matching page:', correctPage); // Debug log
-        
         data = await tryFetchPage(correctPage);
       }
     }
@@ -121,7 +101,6 @@ export async function GET(request: Request) {
     if (data) {
       return NextResponse.json(data);
     } else {
-      // No results found
       return NextResponse.json(
         { error: { code: 'missingtitle', info: 'Item not found in wiki' } },
         { status: 404 }
@@ -134,4 +113,4 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-} 
+}

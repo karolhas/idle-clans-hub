@@ -20,6 +20,8 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
   }, []);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         modalRef.current &&
@@ -29,16 +31,20 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
       }
     };
 
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
 
-  // Custom styles for wiki content
+  // Scoped wiki styles injected here to avoid global CSS conflicts
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = `
@@ -264,7 +270,6 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
           ref={modalRef}
           className="bg-[#0f172a] rounded-2xl shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col border border-white/10"
         >
-          {/* Header */}
           <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-[#1e293b]/50 backdrop-blur sticky top-0 z-10">
             <div className="flex flex-col gap-0.5">
               <h2 className="text-xl font-bold text-white tracking-tight">
@@ -284,14 +289,12 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
             </button>
           </div>
 
-          {/* Content */}
           <div className="overflow-y-auto custom-scrollbar">
             <div
               className="wiki-content"
               dangerouslySetInnerHTML={{ __html: content.html }}
             />
 
-            {/* Footer Source */}
             <div className="mt-8 mb-6 text-center">
               <a
                 href="https://wiki.idleclans.com/index.php/Main_Page"

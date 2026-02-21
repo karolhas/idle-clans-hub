@@ -1,24 +1,22 @@
 import axios from 'axios';
 import type { ItemComprehensive, LatestPricesResponse } from '@/types/market.types';
-
-const BASE_URL = 'https://query.idleclans.com/api';
-const TIMEOUT = 8000;
+import { API_BASE_URL, MARKET_TIMEOUT } from './config';
 
 export const fetchLatestMarketPrices = async (
   includeAveragePrice: boolean = true
 ): Promise<LatestPricesResponse> => {
-  const url = `${BASE_URL}/PlayerMarket/items/prices/latest`;
+  const url = `${API_BASE_URL}/PlayerMarket/items/prices/latest`;
   try {
     const response = await axios.get(url, {
-      params: { includeAveragePrice, _: Date.now() }, // cache-busting param
-      timeout: TIMEOUT,
+      params: { includeAveragePrice, _: Date.now() },
+      timeout: MARKET_TIMEOUT,
       headers: {
+        // bypass browser cache for real-time prices
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
       },
     });
-    // API returns an array of items
     return (response.data ?? []) as LatestPricesResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
@@ -35,14 +33,15 @@ export const fetchLatestMarketPrices = async (
 export const fetchItemComprehensive = async (
   itemId: number
 ): Promise<ItemComprehensive> => {
-  const url = `${BASE_URL}/PlayerMarket/items/prices/latest/comprehensive/${encodeURIComponent(
+  const url = `${API_BASE_URL}/PlayerMarket/items/prices/latest/comprehensive/${encodeURIComponent(
     itemId
   )}`;
   try {
     const response = await axios.get(url, {
-      timeout: TIMEOUT,
-      params: { _: Date.now() }, // cache-busting
+      timeout: MARKET_TIMEOUT,
+      params: { _: Date.now() },
       headers: {
+        // bypass browser cache for real-time prices
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         Pragma: 'no-cache',
         Expires: '0',
@@ -60,5 +59,3 @@ export const fetchItemComprehensive = async (
     throw new Error('Failed to load item details');
   }
 };
-
-

@@ -3,7 +3,7 @@
 import { FaChartBar } from 'react-icons/fa';
 import { useState } from 'react';
 import { GameMode, LeaderboardStat, EntityType, LeaderboardCategory, SkillStat, BossStat, RaidStat } from '@/types/leaderboard.types';
-import { useLeaderboardData } from '@/hooks/useLeaderboardData';
+import { useLeaderboardQuery } from '@/hooks/queries/useLeaderboardQuery';
 import LeaderboardTable from '@/components/leaderboard/LeaderboardTable';
 
 const PLAYER_SKILLS: { value: SkillStat; label: string }[] = [
@@ -72,13 +72,11 @@ export default function RankingsPage() {
   const [category, setCategory] = useState<LeaderboardCategory>('skills');
   const [selectedStat, setSelectedStat] = useState<LeaderboardStat>('total_level');
 
-  const { data, loading, loadingMore, error, hasMore, loadMoreData, dataSource, lastUpdated, forceRefresh } = useLeaderboardData(
+  const { entries: leaderboardEntries, loading, loadingMore, error, hasMore, loadMoreData, dataSource, lastUpdated, forceRefresh } = useLeaderboardQuery(
     gameMode,
     entityType,
     category,
     selectedStat,
-    1,
-    100
   );
 
   return (
@@ -89,10 +87,8 @@ export default function RankingsPage() {
           Leaderboards
         </h1>
 
-        {/* Controls */}
         <div className="bg-[#002020] p-6 rounded-lg shadow-lg mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Entity Type Selector */}
             <div className="space-y-3">
               <label className="text-gray-300 font-medium text-sm uppercase tracking-wide">Entity Type</label>
               <select
@@ -100,12 +96,10 @@ export default function RankingsPage() {
                 onChange={(e) => {
                   const newEntityType = e.target.value as EntityType;
                   setEntityType(newEntityType);
-                  // If switching to pet and current category is bosses/raids, switch to skills
                   if (newEntityType === 'pet' && (category === 'bosses' || category === 'raids')) {
                     setCategory('skills');
                     setSelectedStat('total_level');
                   }
-                  // If switching to pet and current stat is a combat skill or health, switch to total_level
                   if (newEntityType === 'pet' && category === 'skills' && ['attack', 'strength', 'defence', 'archery', 'magic', 'health'].includes(selectedStat)) {
                     setSelectedStat('total_level');
                   }
@@ -118,7 +112,6 @@ export default function RankingsPage() {
               </select>
             </div>
 
-            {/* Game Mode Selector */}
             <div className="space-y-3">
               <label className="text-gray-300 font-medium text-sm uppercase tracking-wide">Game Mode</label>
               <select
@@ -132,9 +125,7 @@ export default function RankingsPage() {
               </select>
             </div>
 
-            {/* Category and Stat Selectors - Show for all entity types */}
             <>
-              {/* Category Selector */}
               <div className="space-y-3">
                 <label className="text-gray-300 font-medium text-sm uppercase tracking-wide">Category</label>
                 <select
@@ -142,7 +133,6 @@ export default function RankingsPage() {
                   onChange={(e) => {
                     const newCategory = e.target.value as LeaderboardCategory;
                     setCategory(newCategory);
-                    // Set default stat based on category
                     if (newCategory === 'skills') setSelectedStat('total_level');
                     else if (newCategory === 'bosses') setSelectedStat('zeus');
                     else if (newCategory === 'raids') setSelectedStat('guardians_of_the_citadel');
@@ -159,7 +149,6 @@ export default function RankingsPage() {
                 </select>
               </div>
 
-              {/* Stat Selector */}
               <div className="space-y-3">
                 <label className="text-gray-300 font-medium text-sm uppercase tracking-wide">
                   {category === 'skills' ? 'Skill' : category === 'bosses' ? 'Boss' : 'Raid'}
@@ -190,14 +179,12 @@ export default function RankingsPage() {
           </div>
         </div>
 
-        {/* Error Display */}
         {error && (
           <div className="bg-red-900/20 border border-red-500/20 rounded-lg p-4 mb-6">
             <p className="text-red-400">{error}</p>
           </div>
         )}
 
-        {/* Data Source Indicator */}
         {dataSource && lastUpdated && !loading && (
           <div className="mb-4 text-right">
             <div className="inline-flex items-center gap-2 text-sm text-gray-400">
@@ -217,15 +204,13 @@ export default function RankingsPage() {
           </div>
         )}
 
-        {/* Leaderboard Table */}
         <LeaderboardTable
-          entries={data?.entries || []}
+          entries={leaderboardEntries}
           isLoading={loading}
           entityType={entityType}
         />
 
-        {/* Load More Button */}
-        {data && data.entries.length > 0 && hasMore && entityType !== 'clan' && (
+        {leaderboardEntries.length > 0 && hasMore && entityType !== 'clan' && (
           <div className="mt-6 text-center">
             <button
               onClick={loadMoreData}
@@ -244,18 +229,16 @@ export default function RankingsPage() {
           </div>
         )}
 
-        {/* End of data message */}
-        {data && data.entries.length > 0 && !hasMore && (
+        {leaderboardEntries.length > 0 && !hasMore && (
           <div className="mt-6 text-center text-gray-400">
             {entityType === 'clan'
               ? 'Showing top clans'
-              : `Showing all ${data.entries.length} ${entityType === 'pet' ? 'pets' : 'players'}`
+              : `Showing all ${leaderboardEntries.length} ${entityType === 'pet' ? 'pets' : 'players'}`
             }
           </div>
         )}
 
-        {/* Initial message */}
-        {data && data.entries.length === 0 && !loading && (
+        {leaderboardEntries.length === 0 && !loading && (
           <div className="mt-6 text-center text-gray-400">
             No data available for the selected criteria
           </div>
