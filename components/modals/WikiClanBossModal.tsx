@@ -111,8 +111,7 @@ export function WikiClanBossModal({ isOpen, onClose, bossName }: WikiClanBossMod
           setClanRequirements(data.requirements);
         }
 
-        // Process drops data
-        const drops: BossDrop[] = data.drops.map((dropItem: any) => ({
+        const drops: BossDrop[] = data.drops.map((dropItem) => ({
           item: dropItem.item,
           quantity: dropItem.quantity,
           rarity: dropItem.chance,
@@ -120,7 +119,6 @@ export function WikiClanBossModal({ isOpen, onClose, bossName }: WikiClanBossMod
         }));
         setBossDrops(drops);
       } else {
-        // Fallback to wiki parsing if boss not found in local data
         setBossStats({});
         setBossDrops([]);
         setClanRequirements(null);

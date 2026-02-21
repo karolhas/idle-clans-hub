@@ -47,8 +47,29 @@ export interface ProcessedBossData {
   }>;
 }
 
+interface RawBossData {
+  name: string;
+  displayName: string;
+  health: number;
+  keyRequired: string;
+  attackInterval: number;
+  attackStyle: string;
+  weakness: string;
+  combatLevels: ProcessedBossData['combatLevels'];
+  bonuses: {
+    meleeStrength: number; meleeAccuracy: number; meleeDefence: number;
+    archeryStrength: number; archeryAccuracy: number; archeryDefence: number;
+    magicStrength: number; magicAccuracy: number; magicDefence: number;
+  };
+  maxHit: number;
+  requirements?: ProcessedBossData['requirements'];
+  drops: ProcessedBossData['drops'];
+}
+
 export function getBossData(bossName: string): ProcessedBossData | null {
-  const boss = bossesData.bosses.find((b: any) => b.name.toLowerCase() === bossName.toLowerCase());
+  const boss = (bossesData.bosses as RawBossData[]).find(
+    (b) => b.name.toLowerCase() === bossName.toLowerCase()
+  );
   if (!boss) return null;
 
   return {
@@ -83,16 +104,17 @@ export function getBossData(bossName: string): ProcessedBossData | null {
 }
 
 export function getClanBossData(bossName: string): ProcessedBossData | null {
-  // Convert formatted name back to snake_case for matching
-  const normalizedName = bossName.toLowerCase().replace(/\s+/g, '_');
-  const boss = clanBossesData.clanBosses.find((b: any) => b.name.toLowerCase() === normalizedName);
+  const normalizedName = bossName.toLowerCase().replace(/\s+/g, "_");
+  const boss = (clanBossesData.clanBosses as RawBossData[]).find(
+    (b) => b.name.toLowerCase() === normalizedName
+  );
   if (!boss) return null;
 
   return {
     name: boss.name,
     displayName: boss.displayName,
     health: boss.health,
-    keyRequired: '', // Clan bosses don't have key requirements
+    keyRequired: "",
     attackInterval: boss.attackInterval,
     attackStyle: boss.attackStyle,
     weakness: boss.weakness,
@@ -120,11 +142,25 @@ export function getClanBossData(bossName: string): ProcessedBossData | null {
   };
 }
 
-export function getRaidData(raidName: string): any {
-  // Convert formatted name back to snake_case for matching
-  const normalizedName = raidName.toLowerCase().replace(/\s+/g, '_');
-  const raid = raidsData.raids.find((r: any) => r.name.toLowerCase() === normalizedName);
-  return raid || null;
+export interface RawDropEntry {
+  item: string;
+  quantity?: string;
+  chance?: string;
+  rarity?: string;
+}
+
+export interface RawRaidData extends Record<string, unknown> {
+  name: string;
+  drops?: RawDropEntry[];
+  requirements?: unknown;
+}
+
+export function getRaidData(raidName: string): RawRaidData | null {
+  const normalizedName = raidName.toLowerCase().replace(/\s+/g, "_");
+  const raid = (raidsData.raids as RawRaidData[]).find(
+    (r) => typeof r.name === "string" && r.name.toLowerCase() === normalizedName
+  );
+  return raid ?? null;
 }
 
 export function getAttackStyleName(attackStyle: string): string {

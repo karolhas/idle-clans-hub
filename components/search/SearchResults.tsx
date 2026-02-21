@@ -1,13 +1,11 @@
 "use client";
-// hooks
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// api
 import {
-  fetchClanMembers,
+  fetchClanByName,
   fetchLeaderboardProfile,
 } from "@/lib/api/apiService";
-// components
 import PvmStatsDisplay from "@/components/pvmstats/PvmStatsDisplay";
 import SkillDisplay from "@/components/skills/SkillDisplay";
 import UpgradesDisplay from "@/components/upgrades/UpgradesDisplay";
@@ -15,12 +13,10 @@ import EquipmentDisplay from "@/components/player/EquipmentDisplay";
 import ClanInfoModal from "@/components/modals/ClanInfoModal";
 import LeaderboardDisplay from "@/components/leaderboard/LeaderboardDisplay";
 
-// types
 import { Player } from "@/types/player.types";
 import { ClanData } from "@/types/clan.types";
 import { LeaderboardProfile } from "@/types/leaderboard.types";
 
-// icons
 import {
   FaGamepad,
   FaShieldAlt,
@@ -68,8 +64,47 @@ function setCachedLeaderboard(
   }
 }
 
+const PLAYER_TAGS: Record<string, { label: string; color: string; icon: string; border: string }> = {
+  Temsei: {
+    label: "Game Dev",
+    color: "bg-gradient-to-r from-slate-800 to-amber-900",
+    icon: "👑",
+    border: "border-2 border-amber-400",
+  },
+  HSK: {
+    label: "Site Creator",
+    color: "bg-gradient-to-r from-purple-600 to-fuchsia-500",
+    icon: "⚡",
+    border: "border-2 border-purple-300",
+  },
+  ZoEzi: {
+    label: "Artist",
+    color: "bg-gradient-to-r from-red-600 to-rose-500",
+    icon: "🎨",
+    border: "border-2 border-red-300",
+  },
+  Shakkuru: {
+    label: "Site Helper",
+    color: "bg-gradient-to-r from-blue-600 to-sky-500",
+    icon: "🔧",
+    border: "border-2 border-blue-300",
+  },
+  Dubz9: {
+    label: "Site Helper",
+    color: "bg-gradient-to-r from-blue-600 to-sky-500",
+    icon: "🔧",
+    border: "border-2 border-blue-300",
+  },
+  DonatorCasesHereKappaPride: {
+    label: "Donator",
+    color: "bg-gradient-to-r from-emerald-600 to-green-500",
+    icon: "🪙",
+    border: "border-2 border-green-300",
+  },
+};
+
 interface SearchResultsProps {
-  player: Player;
+  player?: Player | null;
   error?: string;
   onSearchMember?: (memberName: string) => void;
   onSearchClan?: (clanName: string) => void;
@@ -92,23 +127,23 @@ export default function SearchResults({
 
   useEffect(() => {
     const fetchMembers = async () => {
-      if (player.guildName) {
+      if (player?.guildName) {
         try {
-          const data = await fetchClanMembers(player.guildName);
+          const data = await fetchClanByName(player.guildName);
           setMemberCount(data.memberlist?.length || 0);
           setClanData(data);
-        } catch (error) {
-          console.error("Failed to fetch clan members:", error);
+        } catch (err) {
+          console.error("Failed to fetch clan members:", err);
         }
       }
     };
 
     fetchMembers();
-  }, [player.guildName]);
+  }, [player?.guildName]);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      if (!player.username || !player.gameMode) return;
+      if (!player?.username || !player?.gameMode) return;
 
       const validGameMode =
         player.gameMode === "ironman" ? "ironman" : "default";
@@ -136,7 +171,7 @@ export default function SearchResults({
     };
 
     fetchLeaderboard();
-  }, [player.username, player.gameMode]);
+  }, [player?.username, player?.gameMode]);
 
   if (error) {
     return (
@@ -144,51 +179,11 @@ export default function SearchResults({
         <p className="text-red-600 text-lg">{error}</p>
       </div>
     );
-  } // Custom tag for special members
-  const getPlayerTag = (name: string) => {
-    switch (name) {
-      case "Temsei":
-        return {
-          label: "Game Dev",
-          color: "bg-gradient-to-r from-slate-800 to-amber-900",
-          icon: "👑",
-          border: "border-2 border-amber-400",
-        };
-      case "HSK":
-        return {
-          label: "Site Creator",
-          color: "bg-gradient-to-r from-purple-600 to-fuchsia-500",
-          icon: "⚡",
-          border: "border-2 border-purple-300",
-        };
-      case "ZoEzi":
-        return {
-          label: "Artist",
-          color: "bg-gradient-to-r from-red-600 to-rose-500",
-          icon: "🎨",
-          border: "border-2 border-red-300",
-        };
-      case "Shakkuru":
-      case "Dubz9":
-        return {
-          label: "Site Helper",
-          color: "bg-gradient-to-r from-blue-600 to-sky-500",
-          icon: "🔧",
-          border: "border-2 border-blue-300",
-        };
-      case "DonatorCasesHereKappaPride":
-        return {
-          label: "Donator",
-          color: "bg-gradient-to-r from-emerald-600 to-green-500",
-          icon: "🪙",
-          border: "border-2 border-green-300",
-        };
-      default:
-        return null;
-    }
-  };
+  }
 
-  const tag = getPlayerTag(player.username);
+  if (!player) return null;
+
+  const tag = PLAYER_TAGS[player.username] ?? null;
 
   return (
     <div className="mt-8 animate-fade-in">
@@ -216,7 +211,6 @@ export default function SearchResults({
               </h2>
             </div>
 
-            {/* Player Information */}
             <p className="flex items-center mb-3 font-light text-gray-300">
               <FaUser className="mr-2 text-emerald-500" /> Nickname:
               <span className="text-white ml-2 font-semibold tracking-wide">
