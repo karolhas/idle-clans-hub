@@ -106,4 +106,14 @@ export const CARPENTRY_ITEMS: CarpentryItem[] = [
         goldPerSecond: 14,
         goldCost: 175,
     },
+    {
+        name: 'Ignis Heartwood',
+        level: 105,
+        exp: 2000,
+        seconds: 131.25,
+        expPerSecond: 15.24,
+        goldValue: 375,
+        goldPerSecond: 2.86,
+        goldCost: 175,
+    },
 ];

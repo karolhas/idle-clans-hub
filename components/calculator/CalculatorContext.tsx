@@ -12,7 +12,31 @@ import {
     UpgradeBuffs,
 } from '@/types/calculator.types';
 import { INITIAL_SKILL_BOOSTS } from '@/utils/gamedata/calculator-constants';
+import { XP_TABLE } from '@/utils/common/constants/xpTable';
 import { Player } from '@/types/player.types';
+
+const ALL_SKILLS: SkillType[] = [
+    'crafting', 'mining', 'smithing', 'carpentry', 'farming',
+    'foraging', 'cooking', 'enchanting', 'woodcutting', 'agility',
+    'fishing', 'plundering', 'brewing',
+];
+
+function getLevelFromXp(xp: number): number {
+    for (let level = 120; level >= 1; level--) {
+        if (xp >= XP_TABLE[level]) return level;
+    }
+    return 1;
+}
+
+function buildAutoSkillBoosts(skillExp: Record<string, number>): Record<SkillType, SkillBoosts> {
+    return ALL_SKILLS.reduce((acc, skill) => {
+        const level = getLevelFromXp(skillExp[skill] || 0);
+        const tool = level >= 100 ? 't6' : level >= 90 ? 't5' : INITIAL_SKILL_BOOSTS.tool;
+        const t3Scrolls = level >= 90 ? '4' : INITIAL_SKILL_BOOSTS.t3Scrolls;
+        acc[skill] = { ...INITIAL_SKILL_BOOSTS, tool, t3Scrolls };
+        return acc;
+    }, {} as Record<SkillType, SkillBoosts>);
+}
 
 // Create initial state
 const initialSkillBoosts: Record<SkillType, SkillBoosts> = {
@@ -217,6 +241,7 @@ export function CalculatorProvider({
         (playerData: Player) => {
             // Set current experience from player data
             const skillExp = playerData.skillExperiences || {};
+            const autoSkillBoosts = buildAutoSkillBoosts(skillExp);
 
             // Update state with player data
             setState((prevState) => ({
@@ -224,6 +249,7 @@ export function CalculatorProvider({
                 playerSkillExperiences: skillExp,
                 currentExp: skillExp[prevState.currentSkill.toLowerCase()] || 0,
                 clanName: playerData.guildName,
+                skillBoosts: autoSkillBoosts,
             }));
 
             // Map player upgrades to calculator state

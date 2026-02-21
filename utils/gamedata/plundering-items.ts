@@ -96,4 +96,14 @@ export const PLUNDERING_ITEMS: PlunderingItem[] = [
         goldPerSecond: 0,
         successRate: 6,
     },
+    {
+        name: 'Ancient Tribe',
+        level: 105,
+        exp: 1150,
+        seconds: 80,
+        expPerSecond: 14.38,
+        goldValue: 0,
+        goldPerSecond: 0,
+        successRate: 5,
+    },
 ];

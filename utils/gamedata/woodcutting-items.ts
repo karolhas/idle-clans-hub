@@ -91,4 +91,13 @@ export const WOODCUTTING_ITEMS: SkillItem[] = [
         goldValue: 110,
         goldPerSecond: 5.5,
     },
+    {
+        name: 'Ignis',
+        level: 105,
+        exp: 935,
+        seconds: 150,
+        expPerSecond: 6.23,
+        goldValue: 150,
+        goldPerSecond: 1.0,
+    },
 ];

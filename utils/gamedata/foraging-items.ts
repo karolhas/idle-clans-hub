@@ -82,4 +82,13 @@ export const FORAGING_ITEMS: SkillItem[] = [
         goldValue: 54,
         goldPerSecond: 4.3,
     },
+    {
+        name: 'Smoldering Mushroom',
+        level: 105,
+        exp: 210,
+        seconds: 21.875,
+        expPerSecond: 9.6,
+        goldValue: 85,
+        goldPerSecond: 3.89,
+    },
 ];

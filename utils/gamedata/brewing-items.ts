@@ -82,4 +82,13 @@ export const BREWING_ITEMS: SkillItem[] = [
         goldValue: 1000,
         goldPerSecond: 5.6,
     },
+    {
+        name: 'Dragonfire Potion',
+        level: 105,
+        exp: 2950,
+        seconds: 90,
+        expPerSecond: 32.78,
+        goldValue: 2500,
+        goldPerSecond: 27.78,
+    },
 ];

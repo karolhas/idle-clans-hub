@@ -82,4 +82,13 @@ export const FARMING_ITEMS: SkillItem[] = [
         goldValue: 4000,
         goldPerSecond: 22.2,
     },
+    {
+        name: 'Sunfire Berry',
+        level: 105,
+        exp: 2850,
+        seconds: 315,
+        expPerSecond: 9.05,
+        goldValue: 7500,
+        goldPerSecond: 23.81,
+    },
 ];
