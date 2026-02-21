@@ -232,4 +232,6 @@ export const INITIAL_SKILL_BOOSTS = {
     guardiansChisel: false,
     forgeryPotion: false,
     guardiansTrowel: false,
+    eventBoost: false,
+    eventBoostValue: 0,
 };

@@ -3,17 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 // api
-import { fetchClanMembers } from "@/lib/api/apiService";
+import {
+  fetchClanMembers,
+  fetchLeaderboardProfile,
+} from "@/lib/api/apiService";
 // components
 import PvmStatsDisplay from "@/components/pvmstats/PvmStatsDisplay";
 import SkillDisplay from "@/components/skills/SkillDisplay";
 import UpgradesDisplay from "@/components/upgrades/UpgradesDisplay";
 import EquipmentDisplay from "@/components/player/EquipmentDisplay";
 import ClanInfoModal from "@/components/modals/ClanInfoModal";
+import LeaderboardDisplay from "@/components/leaderboard/LeaderboardDisplay";
 
 // types
 import { Player } from "@/types/player.types";
 import { ClanData } from "@/types/clan.types";
+import { LeaderboardProfile } from "@/types/leaderboard.types";
 
 // icons
 import {
@@ -22,9 +27,46 @@ import {
   FaUser,
   FaUsers,
   FaInfoCircle,
+  FaTrophy,
 } from "react-icons/fa";
 import { GiSwordsEmblem, GiAlarmClock, GiWoodAxe } from "react-icons/gi";
 import { getLevel } from "@/utils/common/calculations/xpCalculations";
+
+const LEADERBOARD_CACHE_DURATION = 5 * 60 * 1000;
+
+function getCachedLeaderboard(
+  username: string,
+  gameMode: string,
+): LeaderboardProfile | null {
+  try {
+    const raw = localStorage.getItem(`leaderboard_${username}_${gameMode}`);
+    if (!raw) return null;
+    const { data, timestamp }: { data: LeaderboardProfile; timestamp: number } =
+      JSON.parse(raw);
+    if (Date.now() - timestamp > LEADERBOARD_CACHE_DURATION) {
+      localStorage.removeItem(`leaderboard_${username}_${gameMode}`);
+      return null;
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedLeaderboard(
+  username: string,
+  gameMode: string,
+  data: LeaderboardProfile,
+): void {
+  try {
+    localStorage.setItem(
+      `leaderboard_${username}_${gameMode}`,
+      JSON.stringify({ data, timestamp: Date.now() }),
+    );
+  } catch {
+    // storage quota exceeded or SSR — ignore
+  }
+}
 
 interface SearchResultsProps {
   player: Player;
@@ -42,6 +84,9 @@ export default function SearchResults({
   const [memberCount, setMemberCount] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [clanData, setClanData] = useState<ClanData | null>(null);
+  const [leaderboardProfile, setLeaderboardProfile] =
+    useState<LeaderboardProfile | null>(null);
+  const [isFetchingLeaderboard, setIsFetchingLeaderboard] = useState(false);
 
   const router = useRouter();
 
@@ -60,6 +105,38 @@ export default function SearchResults({
 
     fetchMembers();
   }, [player.guildName]);
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      if (!player.username || !player.gameMode) return;
+
+      const validGameMode =
+        player.gameMode === "ironman" ? "ironman" : "default";
+
+      const cached = getCachedLeaderboard(player.username, validGameMode);
+      if (cached) {
+        setLeaderboardProfile(cached);
+        return;
+      }
+
+      setIsFetchingLeaderboard(true);
+      setLeaderboardProfile(null);
+      try {
+        const profile = await fetchLeaderboardProfile(
+          player.username,
+          validGameMode,
+        );
+        if (profile) {
+          setCachedLeaderboard(player.username, validGameMode, profile);
+          setLeaderboardProfile(profile);
+        }
+      } finally {
+        setIsFetchingLeaderboard(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, [player.username, player.gameMode]);
 
   if (error) {
     return (
@@ -152,8 +229,8 @@ export default function SearchResults({
                     e.stopPropagation();
                     router.push(
                       `/logs?mode=player&q=${encodeURIComponent(
-                        player.username
-                      )}`
+                        player.username,
+                      )}`,
                     );
                   }}
                   className="ml-3 text-xs px-2.5 py-1 rounded-md bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600 hover:text-white transition-all duration-300"
@@ -176,9 +253,21 @@ export default function SearchResults({
               <span className="text-white ml-2 font-semibold tracking-wide">
                 {Object.values(player.skillExperiences).reduce(
                   (sum, exp) => sum + getLevel(exp),
-                  0
+                  0,
                 )}
                 /2400
+              </span>
+            </p>
+            <p className="flex items-center mb-3 font-light text-gray-300">
+              <FaTrophy className="mr-2 text-emerald-500" /> Rank:
+              <span className="text-white ml-2 font-semibold tracking-wide">
+                {isFetchingLeaderboard ? (
+                  <span className="inline-block w-16 h-4 bg-white/10 rounded animate-pulse" />
+                ) : leaderboardProfile?.totalLevelResult?.rank !== undefined ? (
+                  `#${leaderboardProfile.totalLevelResult.rank.toLocaleString()}`
+                ) : (
+                  "Unranked"
+                )}
               </span>
             </p>
             <p className="flex items-center mb-3 font-light text-gray-300">
@@ -195,7 +284,7 @@ export default function SearchResults({
               </span>
             </p>
             <p className="flex items-center font-light text-gray-300">
-              <GiWoodAxe className="mr-2 text-emerald-500" /> Last Known Task:
+              <GiWoodAxe className="mr-2 text-emerald-500" /> Last Task:
               <span
                 style={{ textTransform: "capitalize" }}
                 className="text-white ml-2 font-semibold tracking-wide"
@@ -260,12 +349,36 @@ export default function SearchResults({
               {Math.floor(
                 Object.values(player.skillExperiences).reduce(
                   (sum, xp) => sum + xp,
-                  0
-                )
+                  0,
+                ),
               ).toLocaleString()}
             </span>
           </p>
           <SkillDisplay skills={player.skillExperiences} />
+        </div>
+
+        <div className="bg-white/5 p-6 rounded-2xl border-2 border-white/10 backdrop-blur-md shadow-xl hover:border-teal-500/50 hover:shadow-teal-900/20 transition-all duration-300 group">
+          <h2 className="text-2xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-teal-500 to-cyan-300 group-hover:text-teal-400 transition-colors">
+            Leaderboard
+          </h2>
+          {isFetchingLeaderboard && (
+            <div className="space-y-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-9 bg-white/5 rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          )}
+          {!isFetchingLeaderboard && leaderboardProfile && (
+            <LeaderboardDisplay profile={leaderboardProfile} />
+          )}
+          {!isFetchingLeaderboard && !leaderboardProfile && (
+            <p className="text-gray-400 text-sm">
+              No leaderboard data available.
+            </p>
+          )}
         </div>
 
         <div className="bg-white/5 p-6 rounded-2xl border-2 border-white/10 backdrop-blur-md shadow-xl hover:border-teal-500/50 hover:shadow-teal-900/20 transition-all duration-300 group">

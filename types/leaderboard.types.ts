@@ -1,3 +1,19 @@
+export interface LeaderboardProfileField {
+  score: number;
+  rank: number;
+  expCapDate: number;
+}
+
+export interface LeaderboardProfile {
+  username: string;
+  totalLevelResult: {
+    totalLevel: number;
+    score: number;
+    rank: number;
+  };
+  fields: Record<string, LeaderboardProfileField>;
+}
+
 export interface LeaderboardEntry {
   rank: number;
   name: string;

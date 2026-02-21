@@ -514,6 +514,51 @@ export default function SkillBoosts() {
               </label>
             </div>
           )}
+
+          {/* Event Boost */}
+          <div className="flex items-center gap-3 p-3 bg-black/90 rounded-lg border border-white/5">
+            <input
+              id="eventBoost"
+              type="checkbox"
+              checked={currentBoosts.eventBoost}
+              onChange={(e) =>
+                setSkillBoost(currentSkill, "eventBoost", e.target.checked)
+              }
+              className="h-4 w-4 text-teal-500 border-white/10 rounded focus:ring-teal-500/50 bg-black/90 shrink-0"
+            />
+            <label
+              htmlFor="eventBoost"
+              className="block text-sm text-gray-300 shrink-0"
+            >
+              Event Boost
+            </label>
+            <div className="flex items-center gap-1 ml-auto">
+              <input
+                type="number"
+                min={0}
+                max={999}
+                value={currentBoosts.eventBoostValue}
+                disabled={!currentBoosts.eventBoost}
+                onChange={(e) =>
+                  setSkillBoost(
+                    currentSkill,
+                    "eventBoostValue",
+                    Math.max(0, parseInt(e.target.value) || 0)
+                  )
+                }
+                className={`w-16 px-2 py-1 text-sm text-center border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all ${
+                  currentBoosts.eventBoost
+                    ? "bg-black/90 border-white/10 text-white"
+                    : "bg-black/20 border-white/5 text-gray-600 cursor-not-allowed"
+                }`}
+              />
+              <span
+                className={`text-sm ${currentBoosts.eventBoost ? "text-gray-300" : "text-gray-600"}`}
+              >
+                %
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>

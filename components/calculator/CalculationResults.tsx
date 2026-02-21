@@ -98,6 +98,11 @@ export default function CalculationResults() {
       totalBoost += outfitBoost;
     }
 
+    // Event boost - custom user-defined XP boost percentage
+    if (currentBoosts.eventBoost && currentBoosts.eventBoostValue > 0) {
+      totalBoost += currentBoosts.eventBoostValue;
+    }
+
     // Return both total boost without XP Boost and with XP Boost
     const baseBoost = totalBoost;
     const boostWithXP = currentBoosts.xpBoost ? totalBoost + 30 : totalBoost;

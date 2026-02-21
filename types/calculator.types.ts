@@ -88,6 +88,8 @@ export interface SkillBoosts {
     guardiansChisel: boolean;
     forgeryPotion: boolean;
     guardiansTrowel: boolean;
+    eventBoost: boolean;
+    eventBoostValue: number;
 }
 
 export interface GeneralBuffs {
