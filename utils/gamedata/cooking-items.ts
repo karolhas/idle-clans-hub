@@ -166,6 +166,16 @@ export const MEAT_ITEMS: SkillItem[] = [
         goldPerSecond: 15,
         category: 'Meat',
     },
+    {
+        name: 'Apex Meat',
+        level: 100,
+        exp: 350,
+        seconds: 12,
+        expPerSecond: 29.17,
+        goldValue: 250,
+        goldPerSecond: 20.83,
+        category: 'Meat',
+    },
 ];
 
 // Dishes category

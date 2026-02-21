@@ -73,4 +73,13 @@ export const AGILITY_ITEMS: SkillItem[] = [
         goldValue: 0,
         goldPerSecond: 0,
     },
+    {
+        name: 'Sunfire Summit',
+        level: 105,
+        exp: 2520,
+        seconds: 262.5,
+        expPerSecond: 9.6,
+        goldValue: 0,
+        goldPerSecond: 0,
+    },
 ];

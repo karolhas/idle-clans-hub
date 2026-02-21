@@ -125,6 +125,18 @@ export const SMITHING_ITEMS: SmithingItem[] = [
         oreBarsNeeded: 1, // Ore bars needed
         coalNeeded: 5000, // Coal needed
     },
+    {
+        name: 'Otherworldly Bar',
+        level: 102,
+        exp: 5000,
+        seconds: 60,
+        expPerSecond: 83.33,
+        goldValue: 100000,
+        goldPerSecond: 1666.67,
+        category: 'Bars',
+        oreBarsNeeded: 1, // Otherworldly ore needed
+        coalNeeded: 10000, // Coal needed
+    },
 
     // Bronze Equipment
     {
@@ -584,5 +596,51 @@ export const SMITHING_ITEMS: SmithingItem[] = [
         goldPerSecond: 33333.3,
         category: 'Astronomical Equipment',
         oreBarsNeeded: 4, // Astronomical bars needed
+    },
+
+    // Otherworldly Equipment
+    {
+        name: 'Otherworldly Helmet',
+        level: 104,
+        exp: 2000,
+        seconds: 9,
+        expPerSecond: 222.22,
+        goldValue: 300000,
+        goldPerSecond: 33333.33,
+        category: 'Otherworldly Equipment',
+        oreBarsNeeded: 2, // Otherworldly bars needed
+    },
+    {
+        name: 'Otherworldly Shield',
+        level: 106,
+        exp: 4000,
+        seconds: 9,
+        expPerSecond: 444.44,
+        goldValue: 600000,
+        goldPerSecond: 66666.67,
+        category: 'Otherworldly Equipment',
+        oreBarsNeeded: 4, // Otherworldly bars needed
+    },
+    {
+        name: 'Otherworldly Platelegs',
+        level: 108,
+        exp: 4000,
+        seconds: 9,
+        expPerSecond: 444.44,
+        goldValue: 600000,
+        goldPerSecond: 66666.67,
+        category: 'Otherworldly Equipment',
+        oreBarsNeeded: 4, // Otherworldly bars needed
+    },
+    {
+        name: 'Otherworldly Platebody',
+        level: 110,
+        exp: 6000,
+        seconds: 9,
+        expPerSecond: 666.67,
+        goldValue: 900000,
+        goldPerSecond: 100000,
+        category: 'Otherworldly Equipment',
+        oreBarsNeeded: 6, // Otherworldly bars needed
     },
 ];
