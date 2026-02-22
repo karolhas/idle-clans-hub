@@ -15,12 +15,15 @@ import {
 import { SiBuymeacoffee } from "react-icons/si";
 import DashboardCard, { type ColorKey } from "@/components/dashboard/DashboardCard";
 import StatCard from "@/components/dashboard/StatCard";
+import { useServerInfoQuery } from "@/hooks/queries/useServerInfoQuery";
 
 export default function Home() {
+  const { data: currentPlayers } = useServerInfoQuery();
+
   const stats = [
     {
       title: "Players Online",
-      value: "2634",
+      value: currentPlayers != null ? currentPlayers.toLocaleString() : "—",
       subtitle: "Playing",
       icon: <FaUsers className="w-5 h-5" />,
       trend: "Right Now",

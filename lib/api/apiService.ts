@@ -72,6 +72,19 @@ export const fetchLeaderboardProfile = async (
     }
 };
 
+export const fetchServerInfo = async (): Promise<number> => {
+    try {
+        const response = await axios.get(
+            `${API_BASE_URL}/Server/info`,
+            { timeout: DEFAULT_TIMEOUT }
+        );
+        const servers: { currentPlayers: number }[] = response.data?.allServers ?? [];
+        return servers.reduce((sum, s) => sum + s.currentPlayers, 0);
+    } catch {
+        throw new Error('Failed to fetch server info.');
+    }
+};
+
 export const fetchLeaderboard = async (
     gameMode: GameMode,
     entityType: EntityType,
