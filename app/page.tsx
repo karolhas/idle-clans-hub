@@ -13,12 +13,22 @@ import {
   FaGlobe,
 } from "react-icons/fa";
 import { SiBuymeacoffee } from "react-icons/si";
-import DashboardCard, { type ColorKey } from "@/components/dashboard/DashboardCard";
+import DashboardCard, {
+  type ColorKey,
+} from "@/components/dashboard/DashboardCard";
 import StatCard from "@/components/dashboard/StatCard";
 import { useServerInfoQuery } from "@/hooks/queries/useServerInfoQuery";
+import { useMonthlyViewsQuery } from "@/hooks/queries/useMonthlyViewsQuery";
 
 export default function Home() {
   const { data: currentPlayers } = useServerInfoQuery();
+
+  const { data: analyticsData, isLoading: isAnalyticsLoading } =
+    useMonthlyViewsQuery();
+
+  const monthlyViews = isAnalyticsLoading
+    ? "—"
+    : (analyticsData?.views ?? 0).toLocaleString();
 
   const stats = [
     {
@@ -30,21 +40,27 @@ export default function Home() {
     },
     {
       title: "All Time Peak",
-      value: "2911",
-      subtitle: "October 2025",
+      value: "2885",
+      subtitle: "February 2026",
       icon: <FaTrophy className="w-5 h-5" />,
       trend: "New Record",
     },
     {
       title: "Website Visitors",
-      value: "8,5k",
+      value: monthlyViews,
       subtitle: "This month",
       icon: <FaGlobe className="w-5 h-5" />,
-      trend: "+22,7%",
+      trend: "Visits",
     },
   ];
 
-  const tools: { title: string; description: string; icon: React.ReactElement; href: string; color: ColorKey }[] = [
+  const tools: {
+    title: string;
+    description: string;
+    icon: React.ReactElement;
+    href: string;
+    color: ColorKey;
+  }[] = [
     {
       title: "Player & Clan Search",
       description:
