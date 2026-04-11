@@ -56,6 +56,11 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
         font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       }
       
+      /* Hide the stray item title paragraph (text-only, no img) above the stats table */
+      .wiki-content > p:first-of-type:not(:has(img)) {
+        display: none;
+      }
+
       /* Base table styles */
       .wiki-content table {
         width: 100%;
@@ -91,19 +96,37 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
         font-size: 0.875rem;
       }
       
+      /* Force every wrapper inside the image cell to be centred block, no floats */
+      .wiki-content table:first-of-type th * {
+        float: none !important;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+
       /* Main item image styling */
-      .wiki-content table:first-of-type th p img,
-      .wiki-content table:first-of-type th .image img {
+      .wiki-content table:first-of-type th img {
         width: 128px !important;
         height: 128px !important;
         object-fit: contain;
-        vertical-align: middle;
         display: block;
         margin: 0 auto;
         filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
       }
 
-      /* Inline images styling */
+      /* Main item image when it lives outside the table (e.g. ammo pages) */
+      .wiki-content > p img,
+      .wiki-content > p a.image img {
+        width: 128px !important;
+        height: 128px !important;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+      }
+
+      /* Inline images styling (small icons inside paragraphs that are NOT the hero image) */
       .wiki-content p:not(.wiki-content table:first-of-type th p) img {
         max-width: 20px;
         height: auto;
@@ -297,7 +320,7 @@ export function WikiModal({ isOpen, onClose, itemName }: WikiModalProps) {
 
             <div className="mt-8 mb-6 text-center">
               <a
-                href="https://wiki.idleclans.com/index.php/Main_Page"
+                href={`https://www.wiki.idleclans.com/index.php/${encodeURIComponent(content.wikiPageName)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-colors border border-blue-500/20"

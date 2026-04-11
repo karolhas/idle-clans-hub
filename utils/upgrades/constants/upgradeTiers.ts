@@ -6,7 +6,7 @@ export const MAX_TIERS = (upgradeName: string): number => {
     lazyRaider: 1,
     extraLoadouts: 15,
     offlineProgress: 6,
-    toolbeltUpgrade: 6,
+    toolbeltUpgrade: 7,
     ancientWisdom: 1,
     masterCrafter: 1,
     mostEfficientFisherman: 5,

@@ -1433,9 +1433,15 @@
                     "name": "Toolbelt Tier 6",
                     "cost": 5000000,
                     "effect": "Allows storing Philosopher's stone, Saw"
+                },
+                {
+                    "tier": 7,
+                    "name": "Toolbelt Tier 7",
+                    "cost": 10000000,
+                    "effect": "Allows storing Invocation Brush stone"
                 }
             ],
-            "maxTier": 6
+            "maxTier": 7
         }
     ],
     "Skilling": [

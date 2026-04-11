@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 interface WikiContent {
   html: string;
   title: string;
+  wikiPageName: string;
 }
 
 interface WikiError {
@@ -14,6 +15,7 @@ export function useWikiContent(itemName: string) {
   const [content, setContent] = useState<WikiContent | null>(null);
   const [error, setError] = useState<WikiError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const resolvedPageName = { current: "" };
 
   useEffect(() => {
     const fetchWikiContent = async () => {
@@ -36,6 +38,8 @@ export function useWikiContent(itemName: string) {
             )
             .join("_");
         }
+
+        resolvedPageName.current = formattedName;
 
         const response = await fetch(`/api/wiki?page=${formattedName}`);
 
@@ -97,21 +101,37 @@ export function useWikiContent(itemName: string) {
           .replace(/<li[^>]*class="toclevel[^"]*"[^>]*>[\s\S]*?<\/li>/g, "")
           .replace(/\[<a[^>]*>edit<\/a> \| <a[^>]*>edit source<\/a>\]/g, "")
           .replace(/>Combat</g, "><")
+          // Rewrite image URLs — handles both old relative paths (/images/thumb/...)
+          // and new absolute URLs (https://www.wiki.idleclans.com/images/thumb/...)
+          // The thumb URL format is: .../filename.png/NNNpx-filename.png
+          // We want just the base filename mapped to our local /gameimages/ folder.
           .replace(
-            /\/images\/thumb\/[^/]+\/[^/]+\/([^/]+)\.png\/[^\"]+/g,
+            /(?:https?:\/\/[^"]*)?\/images\/thumb\/[^/]+\/[^/]+\/([^/]+)\.png\/[^"]+/g,
             (match, filename) => {
               const localFilename = filename.toLowerCase().replace(/\s+/g, "_");
               return `/gameimages/${localFilename}.png`;
             }
           )
-          .replace(/\/index.php\/File:([^"]+)\.png/g, (match, filename) => {
+          .replace(/(?:https?:\/\/[^"]*)?\/index\.php\/File:([^"]+)\.png/g, (match, filename) => {
             const localFilename = filename.toLowerCase().replace(/\s+/g, "_");
             return `/gameimages/${localFilename}.png`;
-          });
+          })
+          // The wiki renders the item as: text<img ...>text<table>...
+          // The leading text (item name) and bare <img> sit outside any wrapper element.
+          // Strip the leading text+image preamble and replace with a centred image block.
+          .replace(
+            /^([^<]*<img[^>]*class="mw-file-element"[^>]*>)/,
+            (_match, imgTag) =>
+              `<div style="display:flex;justify-content:center;padding:1.5rem 0;">${imgTag}</div>`
+          )
+          // Also hide the stray leading text node (item name before the image)
+          // by wrapping the whole preamble up to the first <table> or <p> in a hidden span
+          .replace(/^([^<]+)(<div style="display:flex)/, (_m, text, rest) => rest);
 
         setContent({
           html: processedHtml,
           title: data.parse.title,
+          wikiPageName: data.parse.title.replace(/ /g, "_"),
         });
       } catch (err) {
         console.error("Wiki content error:", err);

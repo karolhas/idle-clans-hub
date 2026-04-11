@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   try {
     const tryFetchPage = async (pageName: string) => {
       const response = await fetch(
-        `https://wiki.idleclans.com/api.php?action=parse&page=${encodeURIComponent(pageName)}&format=json&prop=text&redirects=true`
+        `https://www.wiki.idleclans.com/api.php?action=parse&page=${encodeURIComponent(pageName)}&format=json&prop=text&redirects=true`
       );
 
       if (!response.ok) {
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
 
     if (!data) {
       const searchResponse = await fetch(
-        `https://wiki.idleclans.com/api.php?action=query&list=search&srsearch=${encodeURIComponent(page)}&format=json`
+        `https://www.wiki.idleclans.com/api.php?action=query&list=search&srsearch=${encodeURIComponent(page)}&format=json`
       );
 
       if (!searchResponse.ok) {

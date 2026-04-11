@@ -337,3 +337,58 @@
 .image-error {
   display: none;
 }
+/* =================================================================
+   WIKI ITEM IMAGE CENTERING
+   These rules fix the main item image that the wiki renders as a
+   bare inline element after DOMPurify strips float/div wrappers.
+   ================================================================= */
+
+/* Hero image sitting outside the infobox table (e.g. ammo, consumables) */
+.wiki-content > p {
+  text-align: center;
+}
+
+.wiki-content > p img,
+.wiki-content > p a img {
+  width: 128px !important;
+  height: 128px !important;
+  object-fit: contain;
+  display: block !important;
+  margin: 0 auto !important;
+  float: none !important;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+}
+
+/* Hero image sitting inside the infobox table header */
+.wiki-content table:first-of-type th,
+.wiki-content table:first-of-type th * {
+  float: none !important;
+  text-align: center !important;
+}
+
+.wiki-content table:first-of-type th img {
+  width: 128px !important;
+  height: 128px !important;
+  object-fit: contain;
+  display: block !important;
+  margin: 0 auto !important;
+  float: none !important;
+  filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+}
+
+/* Stray item title text paragraph - hide it */
+.wiki-content > p:first-of-type:not(:has(img)) {
+  display: none;
+}
+
+/* Small inline icons inside table cells - don't let them get huge */
+.wiki-content td img,
+.wiki-content table:not(:first-of-type) img {
+  max-width: 24px !important;
+  height: auto !important;
+  width: auto !important;
+  display: inline-block !important;
+  vertical-align: middle;
+  margin: 0 4px;
+  filter: none;
+}
