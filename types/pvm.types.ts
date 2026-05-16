@@ -10,6 +10,7 @@ export interface PvmStats {
   Mesines: number;
   ReckoningOfTheGods: number;
   GuardiansOfTheCitadel: number;
+  BloodmoonMassacre: number;
   MalignantSpider: number;
   SkeletonWarrior: number;
   OtherworldlyGolem: number;
