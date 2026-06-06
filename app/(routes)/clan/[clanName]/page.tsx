@@ -118,7 +118,7 @@ export default function ClanPage() {
 
       clanSearches.add(name);
     }
-  }, [clanData, decodedClanName, clanSearches]);
+  }, [clanData, decodedClanName]);
 
   const handleTabChange = (tab: "player" | "clan") => {
     setActiveTab(tab);
